@@ -3,8 +3,7 @@
 namespace A5Movie.Services;
 
 /// <summary>
-///     This service interface only exists an example.
-///     It can either be copied and modified, or deleted.
+///     Interface for the FileService classes
 /// </summary>
 public interface IFileService
 {

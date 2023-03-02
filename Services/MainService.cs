@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using A5Movie.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,8 +7,7 @@ using System.IO;
 namespace A5Movie.Services;
 
 /// <summary>
-///     You would need to inject your interfaces here to execute the methods in Invoke()
-///     See the commented out code as an example
+///     Main service to display the menu and prompt for a choice.
 /// </summary>
 public class MainService : IMainService
 {
@@ -26,7 +26,7 @@ public class MainService : IMainService
         if (_fileService.FileCheck(file))
         {
             //Creates list object to track movies
-            List<MovieService> movie = new List<MovieService>();
+            List<Movie> movies = new List<Movie>();
 
             //Display of the main menu
             int choice = 0;
@@ -35,6 +35,7 @@ public class MainService : IMainService
                 Console.WriteLine("1) Add Movie");
                 Console.WriteLine("2) Display All Movies");
                 Console.WriteLine("3) Quit");
+                Console.WriteLine();
 
                 bool validEntry = false;
 
@@ -52,20 +53,39 @@ public class MainService : IMainService
                     }
                 }
 
-                // Logic would need to exist to validate inputs and data prior to writing to the file
-                // You would need to decide where this logic would reside.
-                // Is it part of the FileService or some other service?
+                //Add the movie
                 if (choice == 1)
                 {
-                    //MovieService movie = new MovieService();
-                    movie.Add(new MovieService(movie));
-                    //This seems to write the entire list of movies to the file rather than just the one recently added, how do I get this to just write one record?
-                    string json = JsonConvert.SerializeObject(movie);
-                    _fileService.Write(file,json);
+                    //Create a movie service that tracks the list of movies
+                    MovieService movieService = new MovieService(movies);
+
+                    //Call the movie service to prompt the user for the new movie info
+                    var movie = movieService.CreateMovie();
+
+                    //Add that movie to the list of movies
+                    if (movie != null)
+                    {
+                        movies.Add(movie);
+
+                        //Write the single movie to the file
+                        string json = JsonConvert.SerializeObject(movie);
+                        _fileService.Write(file, json);
+                    }
                 }
+                //Display all movies
                 else if (choice == 2)
                 {
-                    _fileService.Read(file);
+                    Console.WriteLine();
+
+                    if (movies.Count > 0)
+                    {
+                        _fileService.Read(file);
+                    }
+                    else
+                    {
+                        Console.WriteLine("There are no movies to display.");
+                    }
+                    Console.WriteLine();
                 }
             }
             while (choice != 3);

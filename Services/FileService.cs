@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using A5Movie.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace A5Movie.Services;
 
 /// <summary>
-///     This concrete service and method only exists an example.
-///     It can either be copied and modified, or deleted.
+///     Class to handle file services such as read, write and check
 /// </summary>
 public class FileService : IFileService
 {
@@ -18,6 +18,7 @@ public class FileService : IFileService
     {
         _logger = logger;
     }
+    //Display the file contents
     public void Read(string file)
     {
         //_logger.Log(LogLevel.Information, "Reading");
@@ -28,30 +29,14 @@ public class FileService : IFileService
             string line;
             while ((line = sr.ReadLine()) != null)
             {
-                //Console.WriteLine(JsonConvert.DeserializeObject(line));
-                //MovieService m = JsonConvert.DeserializeObject(line);
-                MovieService m = (MovieService)JsonConvert.DeserializeObject(line);
-                Console.WriteLine($"Movie ID: {m.Id}");
-                Console.WriteLine($"Movie Title: {m.Title}");
-                Console.WriteLine($"Movie Genres: {m.Genres}");
+                Movie m = JsonConvert.DeserializeObject<Movie>(line);
+                Console.WriteLine($"Movie: {m.Id} {m.Title} {m.Genres}");
             }
             sr.Close();
         };
-
-        /* I don't get how the example below works??? In my code above the intellisense said to add (MovieService) in front of JsonConvert, but that fails when I run it.
-        string json = @"{
-            'Name': 'Bad Boys',
-            'ReleaseDate': '1995-4-7T00:00:00',
-            'Genres': [
-                'Action',
-                'Comedy'
-            ]
-        }";
-        Movie m = JsonConvert.DeserializeObject(json);
-        string name = m.Name;
-        */
     }
 
+    //Write movie to the file
     public void Write(string file, string json)
     {
         //_logger.Log(LogLevel.Information, "Writing");
@@ -63,9 +48,9 @@ public class FileService : IFileService
         sw.Close();
 
     }
+    //Check if the file exists
     public bool FileCheck(string file)
     {
-        // make sure movie file exists
         if (!File.Exists(file))
         {
             Console.WriteLine($"File does not exist: {file}");
